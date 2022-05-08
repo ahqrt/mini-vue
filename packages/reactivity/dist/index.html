@@ -26,19 +26,44 @@
 
 
     // 分支切换
+    // const state = reactive({flag: true, name: 'zhangsan', age: 30})
+    // let runner =  effect(() => {
+    //   document.getElementById('app').innerHTML = `<h1>${state.age}</h1>`
+    // })
+
+    // runner.effect.stop()
+
+    // setTimeout(() => {
+    //   state.age = 1000
+    //   setTimeout(() => {
+    //     runner()
+    //   }, 2000)
+    // }, 1000)
+
+    // scheduler
+
+    let waiting = false
     const state = reactive({flag: true, name: 'zhangsan', age: 30})
     let runner =  effect(() => {
       document.getElementById('app').innerHTML = `<h1>${state.age}</h1>`
+    }, {
+      scheduler() {
+        console.log('run');
+        if(!waiting) {
+          waiting = true
+          setTimeout(() => {
+            runner()
+            waiting = false
+          }, 1000)
+        }
+      }
     })
 
-    runner.effect.stop()
-
-    setTimeout(() => {
-      state.age = 1000
-      setTimeout(() => {
-        runner()
-      }, 2000)
-    }, 1000)
+    state.age = 1000
+    state.age = 2000
+    state.age = 3000
+    state.age = 4000
+    state.age = 5000
 
 
   </script>

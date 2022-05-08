@@ -35,8 +35,9 @@ class ReactiveEffect {
    */
   deps = []
 
-  constructor(public fn) {
+  constructor(public fn, public scheduler) {
     this.fn = fn
+    this.scheduler = scheduler
   }
 
   /**
@@ -74,10 +75,10 @@ class ReactiveEffect {
   }
 }
 
-export function effect(fn) {
+export function effect(fn, options: any = {}) {
   // fn 可以根据状态的变化重新执行，effect可以嵌套使用
   // 比如vue的组件就是嵌套 effect 执行render函数
-  const _effect = new ReactiveEffect(fn);
+  const _effect = new ReactiveEffect(fn, options.scheduler);
   _effect.run()
   const runner = _effect.run.bind(_effect)
   runner.effect = _effect
@@ -131,7 +132,11 @@ export function trigger(target: object, key: string | symbol, value: any, oldVal
   effects && effects.forEach(effect => {
     // 不能无限循环调用自己
     if (effect !== activeEffect) {
-      effect.run()
+      if (effect.scheduler) {
+        effect.scheduler()
+      } else {
+        effect.run()
+      }
     }
   })
 
