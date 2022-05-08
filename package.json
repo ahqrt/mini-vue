@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "mini vue",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "dev": "node scripts/dev.js reactivity -f global"
+  },
   "keywords": [],
   "author": "ahqrt",
   "license": "MIT",
