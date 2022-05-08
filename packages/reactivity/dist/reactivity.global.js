@@ -25,7 +25,65 @@ var VueReactivity = (() => {
   });
 
   // packages/reactivity/src/effect.ts
-  function effect() {
+  var activeEffect = void 0;
+  var ReactiveEffect = class {
+    constructor(fn) {
+      this.fn = fn;
+      this.active = true;
+      this.parent = null;
+      this.deps = [];
+      this.fn = fn;
+    }
+    run() {
+      if (!this.active) {
+        this.fn();
+      }
+      try {
+        this.parent = activeEffect;
+        activeEffect = this;
+        return this.fn();
+      } finally {
+        activeEffect = this.parent;
+        this.parent = null;
+      }
+    }
+    stop() {
+      this.active = false;
+    }
+  };
+  function effect(fn) {
+    const _effect = new ReactiveEffect(fn);
+    _effect.run();
+  }
+  var targetMap = /* @__PURE__ */ new WeakMap();
+  function track(target, key) {
+    if (!activeEffect)
+      return;
+    let depsMap = targetMap.get(target);
+    if (!depsMap) {
+      targetMap.set(target, depsMap = /* @__PURE__ */ new Map());
+    }
+    let deps = depsMap.get(key);
+    if (!deps) {
+      depsMap.set(key, deps = /* @__PURE__ */ new Set());
+    }
+    let shouldTrack = !deps.has(activeEffect);
+    if (shouldTrack) {
+      deps.add(activeEffect);
+      activeEffect.deps.push(deps);
+    }
+  }
+  function trigger(target, key, value, oldValue) {
+    const depsMap = targetMap.get(target);
+    if (!depsMap) {
+      return;
+    }
+    const effects = depsMap.get(key);
+    effects && effects.forEach((effect2) => {
+      if (effect2 !== activeEffect) {
+        effect2.run();
+      }
+    });
   }
 
   // packages/shared/src/index.ts
@@ -39,11 +97,17 @@ var VueReactivity = (() => {
       if (key === "__v_isReactive" /* IS_REACTIVE */) {
         return true;
       }
+      track(target, key);
       return Reflect.get(target, key, receiver);
     },
     set: (target, key, value, receiver) => {
-      Reflect.set(target, key, value, receiver);
-      return true;
+      const oldValue = target[key];
+      if (oldValue === value) {
+        return true;
+      }
+      const res = Reflect.set(target, key, value, receiver);
+      trigger(target, key, value, oldValue);
+      return res;
     }
   };
 

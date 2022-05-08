@@ -8,15 +8,22 @@
   <script src="./reactivity.global.js"></script>
 </head>
 <body>
+  <div id="app"></div>
   <script>
-    const reactive = VueReactivity.reactive
-    const object = {name: 'zhangsan '}
-
+    const {reactive, effect} = VueReactivity
+    const object = {name: 'zhangsan', age: 13}
     const reactiveObject = reactive(object)
-    const reactiveObject2 = reactive(object)
-    const reactiveObject3 = reactive(reactiveObject2)
-    console.log(reactiveObject === reactiveObject2);
-    console.log(reactiveObject3 === reactiveObject2);
+
+    effect(() => {
+      document.getElementById('app').innerHTML = `<h1>${reactiveObject.name}</h1>`
+      reactiveObject.age++
+    })
+
+    setTimeout(() => {
+      console.log('setTimeout')
+      reactiveObject.name = 'lisi'
+    }, 1000)
+
   </script>
 </body>
 </html>
