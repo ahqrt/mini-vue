@@ -1,8 +1,6 @@
 import { isObject } from "@vue/shared";
+import { mutableHandlers, ReactiveFlags } from "./mutableHandlers";
 
-const enum ReactiveFlags {
-  IS_REACTIVE = '__v_isReactive'
-}
 
 const reactiveMap = new WeakMap()
 
@@ -12,7 +10,6 @@ const reactiveMap = new WeakMap()
  * @param target
  */
 export function reactive(target) {
-
   if (!isObject(target)) {
     return
   }
@@ -30,19 +27,7 @@ export function reactive(target) {
 
   // 传入普通对象，就会通过new proxy代理一次
   // 如果传入的是proxy代理对象，则应该返回这个对象，
-  const proxy = new Proxy(target, {
-    get: (target, key, receiver) => {
-      // 配合20 21行代码使用
-      if (key === ReactiveFlags.IS_REACTIVE) {
-        return true
-      }
-      return Reflect.get(target, key, receiver);
-    },
-    set: (target, key, value, receiver) => {
-      Reflect.set(target, key, value, receiver);
-      return true;
-    }
-  });
+  const proxy = new Proxy(target, mutableHandlers);
   // 将proxy对象和原对象做一个映射，目的是为了
   // 在对一个原对象设置多个proxy对象的时候，节省内存空间
   //比如：
