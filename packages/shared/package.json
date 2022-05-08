@@ -1,0 +1,14 @@
+{
+  "name": "@vue/shared",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {},
+  "buildOptions": {
+    "formats": [
+      "cjs",
+      "esm-bundler"
+    ]
+  },
+  "author": "ahqrt",
+  "license": "MIT"
+}
