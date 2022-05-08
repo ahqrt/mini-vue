@@ -3,6 +3,20 @@
  */
 export let activeEffect = undefined
 
+
+function cleanupEffect(effect: ReactiveEffect) {
+  // 
+  const { deps } = effect
+  for (let i = 0; i < deps.length; i++) {
+    /**
+     * 解除effect，重新依赖收集
+     */
+    deps[i].delete(effect)
+  }
+
+  effect.deps.length = 0
+}
+
 class ReactiveEffect {
   /**
    * effect默认是激活状态
@@ -45,6 +59,9 @@ class ReactiveEffect {
       this.parent = activeEffect
 
       activeEffect = this
+
+      // 这里需要在执行用户函数之前，将之前收集的依赖进行清空
+      cleanupEffect(this)
       return this.fn()
     } finally {
       activeEffect = this.parent
@@ -102,12 +119,13 @@ export function track(target: object, key: string | symbol) {
  * @param oldValue 
  */
 export function trigger(target: object, key: string | symbol, value: any, oldValue: any) {
+  debugger
   const depsMap = targetMap.get(target)
   if (!depsMap) {
     return
   }
 
-  const effects = depsMap.get(key)
+  const effects: Set<ReactiveEffect> = new Set(depsMap.get(key))
   effects && effects.forEach(effect => {
     // 不能无限循环调用自己
     if (effect !== activeEffect) {
