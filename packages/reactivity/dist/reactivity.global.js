@@ -57,11 +57,15 @@ var VueReactivity = (() => {
     }
     stop() {
       this.active = false;
+      cleanupEffect(this);
     }
   };
   function effect(fn) {
     const _effect = new ReactiveEffect(fn);
     _effect.run();
+    const runner = _effect.run.bind(_effect);
+    runner.effect = _effect;
+    return runner;
   }
   var targetMap = /* @__PURE__ */ new WeakMap();
   function track(target, key) {
@@ -82,7 +86,6 @@ var VueReactivity = (() => {
     }
   }
   function trigger(target, key, value, oldValue) {
-    debugger;
     const depsMap = targetMap.get(target);
     if (!depsMap) {
       return;

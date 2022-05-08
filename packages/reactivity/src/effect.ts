@@ -70,6 +70,7 @@ class ReactiveEffect {
   }
   stop() {
     this.active = false
+    cleanupEffect(this)
   }
 }
 
@@ -77,8 +78,10 @@ export function effect(fn) {
   // fn 可以根据状态的变化重新执行，effect可以嵌套使用
   // 比如vue的组件就是嵌套 effect 执行render函数
   const _effect = new ReactiveEffect(fn);
-
   _effect.run()
+  const runner = _effect.run.bind(_effect)
+  runner.effect = _effect
+  return runner
 }
 
 
@@ -119,7 +122,6 @@ export function track(target: object, key: string | symbol) {
  * @param oldValue 
  */
 export function trigger(target: object, key: string | symbol, value: any, oldValue: any) {
-  debugger
   const depsMap = targetMap.get(target)
   if (!depsMap) {
     return

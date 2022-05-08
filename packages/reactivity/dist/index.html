@@ -27,18 +27,19 @@
 
     // 分支切换
     const state = reactive({flag: true, name: 'zhangsan', age: 30})
-    effect(() => {
-      console.log('render');
-      document.getElementById('app').innerHTML = state.flag ? `<h1>${state.name}</h1>` : `<h1>${state.age}</h1>`
+    let runner =  effect(() => {
+      document.getElementById('app').innerHTML = `<h1>${state.age}</h1>`
     })
 
+    runner.effect.stop()
+
     setTimeout(() => {
-      state.flag = false
+      state.age = 1000
       setTimeout(() => {
-        console.log('修改了name，原则上不应该更新');
-        state.name = 'lisi'
-      }, 1000)
+        runner()
+      }, 2000)
     }, 1000)
+
 
   </script>
 </body>
