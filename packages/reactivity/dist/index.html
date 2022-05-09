@@ -4,25 +4,24 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>reactive effect</title>
   <script src="./reactivity.global.js"></script>
 </head>
 <body>
   <div id="app"></div>
   <script>
     const {reactive, effect} = VueReactivity
-    // const object = {name: 'zhangsan', age: 13}
-    // const reactiveObject = reactive(object)
+    const object = {name: 'zhangsan', age: 13}
+    const reactiveObject = reactive(object)
 
-    // effect(() => {
-    //   document.getElementById('app').innerHTML = `<h1>${reactiveObject.name}</h1>`
-    //   reactiveObject.age++
-    // })
+    effect(() => {
+      document.getElementById('app').innerHTML = `<h1>${reactiveObject.name}</h1>`
+    })
 
-    // setTimeout(() => {
-    //   console.log('setTimeout')
-    //   reactiveObject.name = 'lisi'
-    // }, 1000)
+    setTimeout(() => {
+      console.log('setTimeout')
+      reactiveObject.name = 'lisi'
+    }, 1000)
 
 
     // 分支切换
@@ -65,15 +64,15 @@
     // state.age = 4000
     // state.age = 5000
 
-    const state = reactive({flag: true, name: 'zhangsan', age: 30, address: {en: 'en'}})
+    // const state = reactive({flag: true, name: 'zhangsan', age: 30, address: {en: 'en'}})
 
-    effect(() => {
-      document.getElementById('app').innerHTML = `<h1>${state.address.en}</h1>`
-    })
+    // effect(() => {
+    //   document.getElementById('app').innerHTML = `<h1>${state.address.en}</h1>`
+    // })
 
-    setTimeout(() => {
-      state.address.en = 'zh'
-    }, 1000)
+    // setTimeout(() => {
+    //   state.address.en = 'zh'
+    // }, 1000)
 
 
 

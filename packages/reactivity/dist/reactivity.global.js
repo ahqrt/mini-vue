@@ -20,6 +20,7 @@ var VueReactivity = (() => {
   // packages/reactivity/src/index.ts
   var src_exports = {};
   __export(src_exports, {
+    computed: () => computed,
     effect: () => effect,
     reactive: () => reactive
   });
@@ -81,10 +82,15 @@ var VueReactivity = (() => {
     if (!deps) {
       depsMap.set(key, deps = /* @__PURE__ */ new Set());
     }
-    let shouldTrack = !deps.has(activeEffect);
-    if (shouldTrack) {
-      deps.add(activeEffect);
-      activeEffect.deps.push(deps);
+    trackEffects(deps);
+  }
+  function trackEffects(deps) {
+    if (activeEffect) {
+      let shouldTrack = !deps.has(activeEffect);
+      if (shouldTrack) {
+        deps.add(activeEffect);
+        activeEffect.deps.push(deps);
+      }
     }
   }
   function trigger(target, key, value, oldValue) {
@@ -93,6 +99,9 @@ var VueReactivity = (() => {
       return;
     }
     const effects = new Set(depsMap.get(key));
+    triggerEffects(effects);
+  }
+  function triggerEffects(effects) {
     effects && effects.forEach((effect2) => {
       if (effect2 !== activeEffect) {
         if (effect2.scheduler) {
@@ -108,6 +117,10 @@ var VueReactivity = (() => {
   var isObject = (value) => {
     return value !== null && typeof value === "object";
   };
+  var isFunction = (value) => {
+    return typeof value === "function";
+  };
+  var isArray = Array.isArray;
 
   // packages/reactivity/src/mutableHandlers.ts
   var mutableHandlers = {
@@ -149,6 +162,51 @@ var VueReactivity = (() => {
     const proxy = new Proxy(target, mutableHandlers);
     reactiveMap.set(target, proxy);
     return proxy;
+  }
+
+  // packages/reactivity/src/computed.ts
+  var ComputedRefImpl = class {
+    constructor(getter, setter) {
+      this.getter = getter;
+      this.setter = setter;
+      this.effect = void 0;
+      this._dirty = true;
+      this.__v_isReadonly = true;
+      this.__v_isRef = true;
+      this.effect = new ReactiveEffect(getter, () => {
+        if (!this._dirty) {
+          this._dirty = true;
+          triggerEffects(this.dep);
+        }
+      });
+    }
+    get value() {
+      this.dep = /* @__PURE__ */ new Set();
+      trackEffects(this.dep || (this.dep = /* @__PURE__ */ new Set()));
+      if (this._dirty) {
+        this._dirty = false;
+        this._value = this.effect.run();
+      }
+      return this._value;
+    }
+    set value(newValue) {
+      this.setter(newValue);
+    }
+  };
+  function computed(getterOrOptions) {
+    debugger;
+    let onlyGetter = isFunction(getterOrOptions);
+    let getter;
+    let setter;
+    if (onlyGetter) {
+      getter = getterOrOptions;
+      setter = () => {
+      };
+    } else {
+      getter = getterOrOptions.get;
+      setter = getterOrOptions.set;
+    }
+    return new ComputedRefImpl(getter, setter);
   }
   return __toCommonJS(src_exports);
 })();

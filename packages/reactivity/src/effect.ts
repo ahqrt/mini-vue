@@ -17,7 +17,7 @@ function cleanupEffect(effect: ReactiveEffect) {
   effect.deps.length = 0
 }
 
-class ReactiveEffect {
+export class ReactiveEffect {
   /**
    * effect默认是激活状态
    */
@@ -107,13 +107,18 @@ export function track(target: object, key: string | symbol) {
     depsMap.set(key, (deps = new Set()))
   }
 
-  let shouldTrack = !deps.has(activeEffect)
-  if (shouldTrack) {
-    deps.add(activeEffect)
-    activeEffect.deps.push(deps)
-  }
+  trackEffects(deps)
 }
 
+export function trackEffects(deps) {
+  if (activeEffect) {
+    let shouldTrack = !deps.has(activeEffect)
+    if (shouldTrack) {
+      deps.add(activeEffect)
+      activeEffect.deps.push(deps)
+    }
+  }
+}
 
 /**
  * 
@@ -129,6 +134,10 @@ export function trigger(target: object, key: string | symbol, value: any, oldVal
   }
 
   const effects: Set<ReactiveEffect> = new Set(depsMap.get(key))
+  triggerEffects(effects)
+}
+
+export function triggerEffects(effects: Set<ReactiveEffect>) {
   effects && effects.forEach(effect => {
     // 不能无限循环调用自己
     if (effect !== activeEffect) {
@@ -139,5 +148,4 @@ export function trigger(target: object, key: string | symbol, value: any, oldVal
       }
     }
   })
-
 }

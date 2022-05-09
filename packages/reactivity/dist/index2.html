@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>computed</title>
+    <script src="./reactivity.global.js"></script>
+
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    const {reactive, effect, computed} = VueReactivity
+    
+    const state = reactive({firstName: 'zhang', lastName: 'san'})
+
+    const fullName = computed(() =>{
+      console.log('run')
+      return state.firstName + state.lastName
+    })
+
+    setTimeout(() => {
+      state.firstName = 'lisi'
+    }, 1000)
+
+    effect(() => {
+      document.getElementById('app').innerHTML = `<h1>${fullName.value}</h1>`
+    })
+  </script>
+</body>
+</html>
