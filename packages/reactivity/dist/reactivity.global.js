@@ -194,7 +194,6 @@ var VueReactivity = (() => {
     }
   };
   function computed(getterOrOptions) {
-    debugger;
     let onlyGetter = isFunction(getterOrOptions);
     let getter;
     let setter;
