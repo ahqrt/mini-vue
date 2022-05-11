@@ -37,12 +37,20 @@ export function watch(source, cb) {
   } else {
     getter = () => traversal(source)
   }
-
+  let cleanup
+  const onCleanup = (fn) => {
+    // 保存用户传入的函数
+    cleanup = fn
+  }
 
   let oldValue
   const job = () => {
+    // 下一个watch触发， 触发上一次的cleanup方法
+    if (cleanup) {
+      cleanup()
+    }
     const newValue = effect.run()
-    cb(newValue, oldValue)
+    cb(newValue, oldValue, onCleanup)
   }
 
   // 监控自己构造的函数，如果自己构造的函数被调用，则会触发job函数
