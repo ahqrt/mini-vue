@@ -22,7 +22,8 @@ var VueReactivity = (() => {
   __export(src_exports, {
     computed: () => computed,
     effect: () => effect,
-    reactive: () => reactive
+    reactive: () => reactive,
+    watch: () => watch
   });
 
   // packages/reactivity/src/effect.ts
@@ -147,6 +148,9 @@ var VueReactivity = (() => {
   };
 
   // packages/reactivity/src/reactive.ts
+  function isReactive(value) {
+    return !!(value && value["__v_isReactive" /* IS_REACTIVE */]);
+  }
   var reactiveMap = /* @__PURE__ */ new WeakMap();
   function reactive(target) {
     if (!isObject(target)) {
@@ -206,6 +210,39 @@ var VueReactivity = (() => {
       setter = getterOrOptions.set;
     }
     return new ComputedRefImpl(getter, setter);
+  }
+
+  // packages/reactivity/src/watch.ts
+  function traversal(value, set = /* @__PURE__ */ new Set()) {
+    if (!isObject) {
+      return value;
+    }
+    if (set.has(value)) {
+      return value;
+    }
+    set.add(value);
+    for (let key in value) {
+      traversal(value[key], set);
+    }
+    return value;
+  }
+  function watch(source, cb) {
+    let getter;
+    if (!isReactive) {
+      return;
+    }
+    if (isFunction(source)) {
+      getter = source;
+    } else {
+      getter = () => traversal(source);
+    }
+    let oldValue;
+    const job = () => {
+      const newValue = effect2.run();
+      cb(newValue, oldValue);
+    };
+    const effect2 = new ReactiveEffect(getter, job);
+    oldValue = effect2.run();
   }
   return __toCommonJS(src_exports);
 })();
