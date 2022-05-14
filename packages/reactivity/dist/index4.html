@@ -11,16 +11,31 @@
 <body>
   <div id="app"></div>
   <script>
-    const {ref, effect } = VueReactivity
+    const {ref, effect, reactive, toRefs } = VueReactivity
 
-    const obj = ref(false)
+    // const obj = ref(false)
 
-    effect(() => {
-      console.log(obj.value)
+    // effect(() => {
+    //   console.log(obj.value)
+    // })
+
+    // obj.value = false
+
+    const school = reactive({
+      name: 'ahqrt',
+      age: 30
     })
 
-    obj.value = false
-    
+    let {name, age} = toRefs(school)
+
+    effect(() => {
+      console.log(name.value, age.value)
+    })
+
+    setTimeout(() => {
+      // name.value = 'lisi'
+      school.name = 'lisi'
+    }, 1000)
 
 
   </script>

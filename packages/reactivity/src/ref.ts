@@ -1,4 +1,4 @@
-import { isObject } from "@vue/shared";
+import { isArray, isObject } from "@vue/shared";
 import { ReactiveEffect, trackEffects, triggerEffects } from "./effect";
 import { reactive } from "./reactive";
 
@@ -32,4 +32,40 @@ class RefImpl {
 
 export function ref(value) {
   return new RefImpl(value)
+}
+
+export function toRef(object, key) {
+  return new ObjectRefImpl(object, key)
+}
+
+class ObjectRefImpl {
+  constructor(public object, public key) {
+
+  }
+
+  get value() {
+    return this.object[this.key]
+  }
+
+  set value(newValue) {
+    this.object[this.key] = newValue
+  }
+}
+
+/**
+ * 
+ * @param value 传入的对象
+ * @returns 
+ */
+export function toRefs(value) {
+  if (!isObject(value)) {
+    return
+  }
+  const result = isArray(value) ? new Array(value.length) : {};
+
+  for (const key in value) {
+    result[key] = toRef(value, key);
+  }
+
+  return result
 }
