@@ -11,7 +11,7 @@
 <body>
   <div id="app"></div>
   <script>
-    const {ref, effect, reactive, toRefs } = VueReactivity
+    const {ref, effect, reactive, toRefs, proxyRefs } = VueReactivity
 
     // const obj = ref(false)
 
@@ -21,21 +21,34 @@
 
     // obj.value = false
 
-    const school = reactive({
-      name: 'ahqrt',
-      age: 30
-    })
+    // const school = reactive({
+    //   name: 'ahqrt',
+    //   age: 30
+    // })
 
-    let {name, age} = toRefs(school)
+    // let {name, age} = toRefs(school)
+
+    // effect(() => {
+    //   console.log(name.value, age.value)
+    // })
+
+    // setTimeout(() => {
+    //   // name.value = 'lisi'
+    //   school.name = 'lisi'
+    // }, 1000)
+
+    const name = ref('ahqrt')
+    const age = ref(30)
+
+    let school = proxyRefs({
+      name,
+      age,
+      a:1
+    })
 
     effect(() => {
-      console.log(name.value, age.value)
+      app.innerHTML = school.name + school.age
     })
-
-    setTimeout(() => {
-      // name.value = 'lisi'
-      school.name = 'lisi'
-    }, 1000)
 
 
   </script>
