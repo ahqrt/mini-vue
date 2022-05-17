@@ -10,7 +10,7 @@ export function isVNode(value) {
  * @param props 
  * @param children 
  */
-export function createVNode(type, props, children) {
+export function createVNode(type, props, children = null) {
   // 组合方案 shapeFlag
   const shapeFlag = isString(type) ? ShapeFlags.ELEMENT : 0
   /**

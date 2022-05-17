@@ -34,8 +34,63 @@ var VueRuntimeDOM = (() => {
     };
   }
 
+  // packages/shared/src/index.ts
+  var isObject = (value) => {
+    return value !== null && typeof value === "object";
+  };
+  var isString = (value) => {
+    return typeof value === "string";
+  };
+  var isArray = Array.isArray;
+
+  // packages/runtime-core/src/vnode.ts
+  function isVNode(value) {
+    return !!(value && value.__v_isVNode);
+  }
+  function createVNode(type, props, children = null) {
+    const shapeFlag = isString(type) ? 1 /* ELEMENT */ : 0;
+    const vNode = {
+      __v_isVNode: true,
+      shapeFlag,
+      type,
+      props,
+      children,
+      key: props == null ? void 0 : props["key"],
+      el: null
+    };
+    if (children) {
+      let type2 = 0;
+      if (isArray(children)) {
+        type2 = 16 /* ARRAY_CHILDREN */;
+      } else {
+        children = String(children);
+        type2 = 8 /* TEXT_CHILDREN */;
+      }
+      vNode.shapeFlag |= type2;
+      return vNode;
+    }
+  }
+
   // packages/runtime-core/src/h.ts
-  function h() {
+  function h(type, props, children = null) {
+    const l = arguments.length;
+    if (l === 2) {
+      if (isObject(props) && !isArray(props)) {
+        if (isVNode(props)) {
+          return createVNode(type, null, [props]);
+        }
+        return createVNode(type, props);
+      } else {
+        return createVNode(type, null, children);
+      }
+    } else {
+      if (l > 3) {
+        children = Array.from(arguments).slice(2);
+      } else if (l === 3 && isVNode(children)) {
+        children = [children];
+      }
+      return createVNode(type, props, children);
+    }
   }
 
   // packages/runtime-dom/src/nodeOps.ts
