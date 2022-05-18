@@ -11,7 +11,7 @@
   <div id="app"></div>
   <script>
     let { createRenderer, h, render } = VueRuntimeDOM
-    render(h('h1', {style: {color: 'red'}}, 'Hello World'), document.getElementById('app'))
+    render(h('h1', {style: {color: 'red'}}, [h('span', 'hello'), h('span', 'world')]), document.getElementById('app'))
 
   </script>
 </body>

@@ -15,7 +15,7 @@ export function h(type, props, children = null) {
       return createVNode(type, props)
     } else {
       // 子节点数组或者文本
-      return createVNode(type, null, children)
+      return createVNode(type, null, props)
     }
 
   } else {
