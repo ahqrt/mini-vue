@@ -37,7 +37,6 @@ export function createVNode(type, props, children = null) {
       type = ShapeFlags.TEXT_CHILDREN
     }
     vNode.shapeFlag |= type
-    return vNode
   }
-
+  return vNode
 }

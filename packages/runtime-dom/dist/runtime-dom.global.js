@@ -67,8 +67,8 @@ var VueRuntimeDOM = (() => {
         type2 = 8 /* TEXT_CHILDREN */;
       }
       vNode.shapeFlag |= type2;
-      return vNode;
     }
+    return vNode;
   }
 
   // packages/runtime-core/src/h.ts
