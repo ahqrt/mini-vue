@@ -82,12 +82,18 @@ export function createRenderer(renderOptions) {
     }
   }
 
+  const unmount = (vnode) => {
+    hostRemove(vnode.el)
+  }
+
   const render = (vNode, container) => {
     console.log('vNode', vNode, 'container', container)
 
     // 如果当前vNode是空的话，说明没有需要渲染的内容, 走一个卸载逻辑
     if (vNode === null) {
-
+      if (container._vnode) {
+        unmount(container._vnode)
+      }
     } else {
       // 这里既有初始化的逻辑，也有更新的逻辑
       patch(container._vnode || null, vNode, container)

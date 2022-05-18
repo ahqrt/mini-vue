@@ -128,9 +128,15 @@ var VueRuntimeDOM = (() => {
       } else {
       }
     };
+    const unmount = (vnode) => {
+      hostRemove(vnode.el);
+    };
     const render2 = (vNode, container) => {
       console.log("vNode", vNode, "container", container);
       if (vNode === null) {
+        if (container._vnode) {
+          unmount(container._vnode);
+        }
       } else {
         patch(container._vnode || null, vNode, container);
       }
