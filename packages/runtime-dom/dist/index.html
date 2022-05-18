@@ -10,8 +10,9 @@
 <body>
   <div id="app"></div>
   <script>
-    let { createRenderer, h, render } = VueRuntimeDOM
-    render(h('h1', {style: {color: 'red'}}, [h('span', 'hello'), h('span', 'world')]), document.getElementById('app'))
+    let { createRenderer, h, render, Text } = VueRuntimeDOM
+    render(h('h1', {style: {color: 'red'}}, [h('span', 'hello'), '123']), document.getElementById('app'))
+    // render(h(Text, 'hello'), document.getElementById('app'))
 
   </script>
 </body>

@@ -1,4 +1,5 @@
-import { ShapeFlags } from "@vue/shared"
+import { isString, ShapeFlags } from "@vue/shared"
+import { createVNode, Text } from "./vnode"
 
 export function createRenderer(renderOptions) {
 
@@ -13,9 +14,18 @@ export function createRenderer(renderOptions) {
     patchProp: hostPatchProp,
   } = renderOptions
 
+  const normalize = (vNode) => {
+    if (isString(vNode)) {
+      return createVNode(Text, null, vNode)
+    }
+    return vNode
+  }
   const mountChildren = (children, container) => {
     for (let i = 0; i < children.length; i++) {
-      patch(null, children[i], container)
+
+      let child = normalize(children[i])
+
+      patch(null, child, container)
     }
   }
 
@@ -40,17 +50,35 @@ export function createRenderer(renderOptions) {
     hostInsert(el, container)
   }
 
+  const processText = (n1, n2, container) => {
+    if (n1 === null) {
+      hostInsert((n2.el = hostCreateText(n2.children)), container)
+    }
+  }
 
   // 核心的path逻辑
   const patch = (oldVNode, newVNode, container) => {
     if (oldVNode === newVNode) return
 
+    const { type, shapeFlag } = newVNode
+
     if (oldVNode === null) {
+
       // 初次渲染
       // 后续还有组建的初次渲染，当前是元素的初始化渲染
-      mountElement(newVNode, container)
-    } else {
+      switch (type) {
+        case Text:
+          processText(oldVNode, newVNode, container)
+          break
 
+        default:
+          if (shapeFlag & ShapeFlags.ELEMENT) {
+            mountElement(newVNode, container)
+          }
+      }
+
+    } else {
+      // 更新流程
     }
   }
 
@@ -63,8 +91,8 @@ export function createRenderer(renderOptions) {
     } else {
       // 这里既有初始化的逻辑，也有更新的逻辑
       patch(container._vnode || null, vNode, container)
-      container._vnode = vNode
     }
+    container._vnode = vNode
   }
 
   return {
