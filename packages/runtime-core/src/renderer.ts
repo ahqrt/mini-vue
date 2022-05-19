@@ -1,5 +1,5 @@
 import { isString, ShapeFlags } from "@vue/shared"
-import { createVNode, Text } from "./vnode"
+import { createVNode, isSameVNodeType, Text } from "./vnode"
 
 export function createRenderer(renderOptions) {
 
@@ -68,6 +68,12 @@ export function createRenderer(renderOptions) {
   // 核心的path逻辑
   const patch = (oldVNode, newVNode, container) => {
     if (oldVNode === newVNode) return
+
+    if (oldVNode && !isSameVNodeType(oldVNode, newVNode)) {
+      unmount(oldVNode)
+      oldVNode = null
+
+    }
 
     const { type, shapeFlag } = newVNode
 

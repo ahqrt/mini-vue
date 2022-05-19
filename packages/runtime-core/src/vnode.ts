@@ -7,6 +7,17 @@ export function isVNode(value) {
 }
 
 /**
+ * 判断两个虚拟节点是不是相同节点
+ * 标签相同，key相同
+ * @param n1 
+ * @param n2 
+ * @returns 
+ */
+export function isSameVNodeType(n1, n2) {
+  return n1.type === n2.type && n1.key === n2.key
+}
+
+/**
  * 
  * @param type 
  * @param props 
