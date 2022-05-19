@@ -53,6 +53,11 @@ export function createRenderer(renderOptions) {
   const processText = (n1, n2, container) => {
     if (n1 === null) {
       hostInsert((n2.el = hostCreateText(n2.children)), container)
+    } else {
+      const el = n2.el = n1.el
+      if (n1.children !== n2.children) {
+        hostSetText(el, n2.children)
+      }
     }
   }
 

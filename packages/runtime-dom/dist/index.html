@@ -11,8 +11,8 @@
   <div id="app"></div>
   <script>
     let { createRenderer, h, render, Text } = VueRuntimeDOM
-    render(h('h1', {style: {color: 'red'}}, [h('span', 'hello'), '123']), document.getElementById('app'))
-    // render(h(Text, 'hello'), document.getElementById('app'))
+    // render(h('h1', {style: {color: 'red'}}, [h('span', 'hello'), '123']), document.getElementById('app'))
+    render(h(Text, 'world'), document.getElementById('app'))
     setTimeout(() => {
       render(h(Text, 'hello'), document.getElementById('app'))
     }, 1000)
