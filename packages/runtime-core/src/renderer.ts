@@ -56,29 +56,33 @@ export function createRenderer(renderOptions) {
     }
   }
 
+  const processElement = (n1, n2, container) => {
+    if (n1 === null) {
+      mountElement(n2, container)
+    } else {
+      // 元素更新
+      // patchElement(n1, n2, container)
+    }
+  }
+
   // 核心的path逻辑
   const patch = (oldVNode, newVNode, container) => {
     if (oldVNode === newVNode) return
 
     const { type, shapeFlag } = newVNode
 
-    if (oldVNode === null) {
 
-      // 初次渲染
-      // 后续还有组建的初次渲染，当前是元素的初始化渲染
-      switch (type) {
-        case Text:
-          processText(oldVNode, newVNode, container)
-          break
+    // 初次渲染
+    // 后续还有组建的初次渲染，当前是元素的初始化渲染
+    switch (type) {
+      case Text:
+        processText(oldVNode, newVNode, container)
+        break
 
-        default:
-          if (shapeFlag & ShapeFlags.ELEMENT) {
-            mountElement(newVNode, container)
-          }
-      }
-
-    } else {
-      // 更新流程
+      default:
+        if (shapeFlag & ShapeFlags.ELEMENT) {
+          processElement(oldVNode, newVNode, container)
+        }
     }
   }
 
